@@ -98,7 +98,7 @@ const TileBg: React.FC = () => {
   };
 
   return (
-    <div className="absolute inset-0 bg-white overflow-hidden">
+    <div className="absolute inset-0 z-0 bg-white overflow-hidden opacity-40">
       <div
         className="grid w-full h-full"
         style={{
