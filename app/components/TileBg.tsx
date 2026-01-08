@@ -1,46 +1,54 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const DECAY_DESKTOP = 0.03;
-const DECAY_MOBILE = 0.0015; // slower = stays longer
+const DECAY_MOBILE = 0.0015;
 const TILE_SIZE = 60;
 const MOBILE_WIDTH = 800;
 const MOBILE_MIN = 500;
-const MOBILE_MAX = 200
+const MOBILE_MAX = 200;
 
-
-const TileBg: React.FC = () => {
+const TileBg: React.FC<TileBgProps> = ({ parentRef }) => {
   const [dims, setDims] = useState({ rows: 0, cols: 0 });
   const [isPassive, setIsPassive] = useState(false);
-
-  /* -------------------- Screen + device detection -------------------- */
-  useEffect(() => {
-    const update = () => {
-      setDims({
-        rows: Math.ceil(window.innerHeight / TILE_SIZE),
-        cols: Math.ceil(window.innerWidth / TILE_SIZE),
-      });
-
-      const isTouch =
-        window.matchMedia("(pointer: coarse)").matches ||
-        window.innerWidth < MOBILE_WIDTH;
-
-      setIsPassive(isTouch);
-    };
-
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  const TILE_COUNT = dims.rows * dims.cols;
-
-  const tiles = useMemo(() => Array.from({ length: TILE_COUNT }), [TILE_COUNT]);
 
   const tileRefs = useRef<(HTMLDivElement | null)[]>([]);
   const heat = useRef<number[]>([]);
   const randomIntervalRef = useRef<number | null>(null);
 
-  /* -------------------- Resize buffers safely -------------------- */
+  /* -------------------- Parent resize detection -------------------- */
+  useEffect(() => {
+    if (!parentRef.current) return;
+
+    const update = () => {
+      if (!parentRef.current) return;
+
+      const { width, height } =
+        parentRef.current.getBoundingClientRect();
+
+      setDims({
+        rows: Math.ceil(height / TILE_SIZE),
+        cols: Math.ceil(width / TILE_SIZE),
+      });
+
+      const isTouch =
+        window.matchMedia("(pointer: coarse)").matches ||
+        width < MOBILE_WIDTH;
+
+      setIsPassive(isTouch);
+    };
+
+    update();
+
+    const observer = new ResizeObserver(update);
+    observer.observe(parentRef.current);
+
+    return () => observer.disconnect();
+  }, [parentRef]);
+
+  const TILE_COUNT = dims.rows * dims.cols;
+  const tiles = useMemo(() => Array.from({ length: TILE_COUNT }), [TILE_COUNT]);
+
+  /* -------------------- Resize buffers -------------------- */
   useEffect(() => {
     heat.current = Array(TILE_COUNT).fill(0);
     tileRefs.current = [];
@@ -53,8 +61,9 @@ const TileBg: React.FC = () => {
     let raf: number;
 
     const animate = () => {
+      const decay = isPassive ? DECAY_MOBILE : DECAY_DESKTOP;
+
       for (let i = 0; i < heat.current.length; i++) {
-        const decay = isPassive ? DECAY_MOBILE : DECAY_DESKTOP;
         heat.current[i] = Math.max(0, heat.current[i] - decay);
 
         const el = tileRefs.current[i];
@@ -68,15 +77,14 @@ const TileBg: React.FC = () => {
 
     animate();
     return () => cancelAnimationFrame(raf);
-  }, [TILE_COUNT]);
+  }, [TILE_COUNT, isPassive]);
 
   /* -------------------- Passive random trail (mobile) -------------------- */
   useEffect(() => {
     if (!isPassive || !TILE_COUNT) return;
 
     const triggerRandomTile = () => {
-      const index = Math.floor(Math.random() * TILE_COUNT);
-      heat.current[index] = 1;
+      heat.current[Math.floor(Math.random() * TILE_COUNT)] = 1;
     };
 
     randomIntervalRef.current = window.setInterval(
@@ -91,14 +99,14 @@ const TileBg: React.FC = () => {
     };
   }, [isPassive, TILE_COUNT]);
 
-  /* -------------------- Mouse interaction (desktop only) -------------------- */
+  /* -------------------- Mouse interaction -------------------- */
   const handleEnter = (i: number) => {
     if (isPassive) return;
     heat.current[i] = 1;
   };
 
   return (
-    <div className="absolute inset-0 z-0 bg-white overflow-hidden opacity-40">
+    <div className="absolute inset-0 z-0 overflow-hidden opacity-40">
       <div
         className="grid w-full h-full"
         style={{
@@ -109,26 +117,18 @@ const TileBg: React.FC = () => {
         {tiles.map((_, i) => (
           <div
             key={i}
-            ref={(el) => {
-              tileRefs.current[i] = el;
-            }}
+            ref={(el) => {(tileRefs.current[i] = el)}}
             onMouseEnter={() => handleEnter(i)}
-            className="border-[.5px] border-slate-400"
+            className="border-[0.5px] border-black/40"
           />
         ))}
       </div>
 
-      {/* Bottom fade */}
-      <div className="pointer-events-none absolute bottom-0 left-0 w-full h-[25rem] bg-gradient-to-t from-white to-transparent" />
-
-      {/* Left fade */}
-      <div className="pointer-events-none absolute bottom-0 left-0 w-40 h-full bg-gradient-to-r from-white to-transparent" />
-
-      {/* Right fade */}
-      <div className="pointer-events-none absolute bottom-0 right-0 w-40 h-full bg-gradient-to-l from-white to-transparent" />
-
-      {/* Top fade */}
-      <div className="pointer-events-none absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-white to-transparent" />
+      {/* Fades */}
+      <div className="pointer-events-none absolute bottom-0 left-0 w-full h-[25rem] bg-gradient-to-t from-black/30 to-transparent" />
+      <div className="pointer-events-none absolute bottom-0 left-0 w-40 h-full bg-gradient-to-r from-black/30 to-transparent" />
+      <div className="pointer-events-none absolute bottom-0 right-0 w-40 h-full bg-gradient-to-l from-black/30 to-transparent" />
+      <div className="pointer-events-none absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-black/30 to-transparent" />
     </div>
   );
 };

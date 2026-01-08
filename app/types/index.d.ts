@@ -56,3 +56,7 @@ interface Feedback {
     }[];
   };
 }
+
+type TileBgProps = {
+  parentRef: React.RefObject<HTMLDivElement | null>;
+};
