@@ -1,6 +1,7 @@
 import React, { useCallback, useState, type ActionDispatch, type SetStateAction } from "react";
 import { useDropzone } from "react-dropzone";
-import { formatSize } from "~/utils";
+import { formatSize } from "~/lib/utils";
+
 
 interface FileUploaderProps {
   file: File | null;
@@ -47,7 +48,8 @@ const FileUploader = ({ file,setFile }:FileUploaderProps) => {
         </div>
       ) : (
         <div className="w-full cursor-pointer gradient-border text-center text-white">
-          <p>Select or Drag and Drop your Resume</p>
+          <p> <span className="font-semibold"> CLICK TO UPLOAD </span> or drag and drop</p>
+          <p className="opacity-80"> <span className="font-semibold">MAX PDF </span>({formatSize(20 * 1024**2)})</p>
         </div>
       )}
     </div>
