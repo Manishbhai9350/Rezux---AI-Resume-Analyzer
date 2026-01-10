@@ -151,10 +151,6 @@ export const prepareInstructions = ({
   If there is a lot to improve, don't hesitate to give low scores. This is to help the user to improve their resume.
   If available, use the job description for the job user is applying to to give more detailed feedback.
   If provided, take the job description into consideration.
-
-  Key Things To Consider
-    Give each category and score out of 10.
-    An overallScore of the resume out of 100.
   
   The job title is: ${jobTitle}
   The job description is: ${jobDescription}

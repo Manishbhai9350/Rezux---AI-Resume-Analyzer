@@ -42,7 +42,7 @@ const resume = () => {
       setImageUrl(imgUrl);
       setFeedback(Resume.feedback);
 
-      console.log(Resume.feedback)
+      console.log(Resume.feedback.ATS)
 
       setFetchingResume(false);
     }
