@@ -1,7 +1,6 @@
 import TileBg from "~/components/TileBg";
 import type { Route } from "./+types/home";
 import Navbar from "~/components/Navbar";
-import { resumes } from "~/constants";
 import ResumeCard from "~/components/ResumeCard";
 import { useEffect, useRef, useState } from "react";
 import { usePuterStore } from "~/lib/puter";
