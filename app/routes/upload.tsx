@@ -134,7 +134,7 @@ const upload = () => {
       <section className="main-section w-full min-h-screen h-fit relative z-20">
         {isProcessing ? (
           <div className="w-full flex flex-col justify-start items-center">
-            <h1 className="text-xl text-center">{processingMessage}</h1>
+            <h1 className="!text-xl text-center">{processingMessage}</h1>
             <img
               src="/images/resume-scan.gif"
               alt="processing-resume"

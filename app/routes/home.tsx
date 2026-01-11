@@ -34,7 +34,10 @@ export default function Home() {
     const FetchResumes = async () => {
       const resumes = (await kv.list("resume:*", true)) as KVItem[];
 
-      if (!resumes || !resumes?.length) return;
+      if (!resumes || !resumes?.length) {
+        setIsFetchingResumes(false);
+        return
+      };
 
       const parsed = resumes.map(
         (resume) => JSON.parse(resume.value) as Resume
@@ -53,13 +56,13 @@ export default function Home() {
       <Navbar />
       <section
         ref={containerRef}
-        className="main-section max-w-[1400px] relative z-10 px-4"
+        className="main-section max-w-[1400px] relative z-10 px-6"
       >
-        <div className="section-headings">
+        <div className="section-headings flex flex-col justify-start items-center gap-2">
           <h1 className="text-center !text-4xl">
             Analyze Your Resume. Beat the ATS.
           </h1>
-          <h2 className="text-center !text-sm">
+          <h2 className="text-center !text-sm max-w-[80%]">
             Get instant, AI-powered insights to improve keyword match,
             structure, and readability.
           </h2>
@@ -75,9 +78,9 @@ export default function Home() {
           <div className="upload capatilize text-md font-semibold text-gray-600">
             click{" "}
             <Link to="/upload" className="navbar-button primary-button w-fit">
-              Upload Resume
+              Upload
             </Link> {" "}
-            your first resume
+            to analyze your first resume
           </div>
         )}
 
