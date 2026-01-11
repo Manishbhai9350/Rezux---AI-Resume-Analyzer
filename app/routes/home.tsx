@@ -21,7 +21,7 @@ export default function Home() {
 
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [IsFetchingResumes, setIsFetchingResumes] = useState(false);
+  const [IsFetchingResumes, setIsFetchingResumes] = useState(true);
   const [Resumes, setResumes] = useState<null | Resume[]>(null);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function Home() {
           </div>
         )}
 
-        {!Resumes?.length && (
+        {!Resumes?.length && !IsFetchingResumes && (
           <div className="upload capatilize text-md font-semibold text-gray-600">
             click{" "}
             <Link to="/upload" className="navbar-button primary-button w-fit">

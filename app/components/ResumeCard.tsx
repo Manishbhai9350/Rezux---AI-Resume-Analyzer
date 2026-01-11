@@ -42,7 +42,7 @@ const ResumeCard = ({
   
 
   return (
-    <div className="resume-card">
+    <div className="resume-card my-4">
       <div className="resume-card-header">
         <div className="flex flex-col">
           { jobTitle && <h1 className="!text-xl">{jobTitle}</h1>}
